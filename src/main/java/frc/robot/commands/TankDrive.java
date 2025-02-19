@@ -36,7 +36,7 @@ public class TankDrive extends Command {
         // double rightPower = Robot.JOYSTICK.   
         double l = leftPower.get(); 
         double r = rightPower.get(); 
-        d.arcadeDrive(l, r);
+        d.arcadeDrive(l*.75, r*.75);
     }
 
     @Override
