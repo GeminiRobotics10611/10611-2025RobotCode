@@ -39,7 +39,7 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the trigger bindings
     
-    driveTrain.setDefaultCommand(new TankDrive(driveTrain, () -> JOYSTICK.getLeftY(), () -> JOYSTICK.getRightX()));
+    driveTrain.setDefaultCommand(new TankDrive(driveTrain, () -> JOYSTICK.getLeftX(), () -> JOYSTICK.getRightY()));
     configureBindings();
   }
 
