@@ -20,10 +20,11 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
   }
 
-    public static final int[] LEFT_GROUP  = {1,2}; 
+    public static final int[] LEFT_GROUP = {1,2};
     public static final int[] RIGHT_GROUP = {3,4};
 
-    public static final SparkMax leftMotor = new SparkMax(1, MotorType.kBrushed); 
-    public static final SparkMax rightMotor = new SparkMax(2, MotorType.kBrushed); 
+    public static final SparkMax leftMotor = new SparkMax(1, MotorType.kBrushed);
+    public static final SparkMax rightMotor = new SparkMax(2, MotorType.kBrushed);
+  
     
 }
