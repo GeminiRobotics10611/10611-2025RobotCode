@@ -7,9 +7,13 @@ package frc.robot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
@@ -24,36 +28,57 @@ public class Robot extends TimedRobot {
   private SparkMax leftFollower;
   private SparkMax rightLeader;
   private SparkMax rightFollower;
-  //private SparkMax elevator1 = new SparkMax(0, MotorType.kBrushless);
-  //private SparkMax elevator2 = new SparkMax(0, MotorType.kBrushless);
-  //private SparkMax intake = new SparkMax(0, MotorType.kBrushless);
- // private SparkMax intakePitch = new SparkMax(0, MotorType.kBrushless);
-
+  private DifferentialDrive drive;
   private Joystick joy1 = new Joystick(0);
 
-  private double startTime;
-
   public Robot() {
-    // Configure left side of drive.
     leftLeader = new SparkMax(1, MotorType.kBrushed);
     leftFollower = new SparkMax(2, MotorType.kBrushed);
-    var configLeftFollower = new SparkMaxConfig();
-    configLeftFollower.follow(leftLeader);
-    leftFollower.configure(configLeftFollower, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-    // Configure right side of drive.
     rightLeader = new SparkMax(3, MotorType.kBrushed);
     rightFollower = new SparkMax(4, MotorType.kBrushed);
-    var configRightFollower = new SparkMaxConfig();
-    configRightFollower.follow(rightLeader);
-    rightFollower.configure(configLeftFollower, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    drive = new DifferentialDrive(rightLeader::set, leftLeader::set);
 
+    SparkMaxConfig globalConfig = new SparkMaxConfig();
+    SparkMaxConfig rightLeaderConfig = new SparkMaxConfig();
+    SparkMaxConfig leftFollowerConfig = new SparkMaxConfig();
+    SparkMaxConfig rightFollowerConfig = new SparkMaxConfig();
 
+    globalConfig
+        .smartCurrentLimit(50)
+        .idleMode(IdleMode.kBrake);
+
+    rightLeaderConfig
+      .apply(globalConfig)
+      .inverted(true);
+
+    leftFollowerConfig
+      .apply(globalConfig)
+      .follow(leftLeader);
+
+    rightFollowerConfig 
+      .apply(globalConfig)
+      .follow(rightLeader);
+
+    leftLeader.configure(globalConfig,
+      ResetMode.kResetSafeParameters, 
+      PersistMode.kPersistParameters);
+    rightLeader.configure(rightLeaderConfig,
+      ResetMode.kResetSafeParameters, 
+      PersistMode.kPersistParameters);
+    leftFollower.configure(leftFollowerConfig, 
+      ResetMode.kResetSafeParameters, 
+      PersistMode.kPersistParameters);
+    rightFollower.configure(rightFollowerConfig, 
+      ResetMode.kResetSafeParameters, 
+      PersistMode.kPersistParameters);
   }
 
  
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    SmartDashboard.putNumber("Left Out", leftLeader.getAppliedOutput());
+    SmartDashboard.putNumber("Right Out", rightLeader.getAppliedOutput());
+  }
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
@@ -64,83 +89,59 @@ public class Robot extends TimedRobot {
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
-  public void autonomousInit() {
-    startTime = Timer.getFPGATimestamp();
-  }
+  public void autonomousInit() {}
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    //Autonomous + Autonomous Stop
-    double time = Timer.getFPGATimestamp();
-    if (joy1.getRawButtonPressed(8)) {
-      leftLeader.set(0);
-      leftFollower.set(0);
-      rightLeader.set(0);
-      rightFollower.set(0);
-    } else {
-      if (time - startTime < 2.7) {
-        leftLeader.set(0.6);
-        leftFollower.set(0.6);
-        rightLeader.set(-0.6);
-        rightFollower.set(-0.6);
-      } else if (time - startTime < 3.63) {
-        leftLeader.set(0.3);
-        leftFollower.set(0.3);
-        rightLeader.set(0.3);
-        rightFollower.set(0.3);
-      } else if (time - startTime < 4.3) {
-        leftLeader.set(0.6);
-        leftFollower.set(0.6);
-        rightLeader.set(-0.6);
-        rightFollower.set(-0.6);
-      } else if (time - startTime < 6.3) {
-        leftLeader.set(0.6);
-        leftFollower.set(0.6);
-        rightLeader.set(-0.6);
-        rightFollower.set(-0.6);
-      } else {
-        leftLeader.set(0);
-        leftFollower.set(0);
-        rightLeader.set(0);
-        rightFollower.set(0);
-      }
-    }
+    // //Autonomous + Autonomous Stop
+    // double time = Timer.getFPGATimestamp();
+    // if (joy1.getRawButtonPressed(8)) {
+    //   leftLeader.set(0);
+    //   leftFollower.set(0);
+    //   rightLeader.set(0);
+    //   rightFollower.set(0);
+    // } else {
+    //   if (time - startTime < 2.7) {
+    //     leftLeader.set(0.6);
+    //     leftFollower.set(0.6);
+    //     rightLeader.set(-0.6);
+    //     rightFollower.set(-0.6);
+    //   } else if (time - startTime < 3.63) {
+    //     leftLeader.set(0.3);
+    //     leftFollower.set(0.3);
+    //     rightLeader.set(0.3);
+    //     rightFollower.set(0.3);
+    //   } else if (time - startTime < 4.3) {
+    //     leftLeader.set(0.6);
+    //     leftFollower.set(0.6);
+    //     rightLeader.set(-0.6);
+    //     rightFollower.set(-0.6);
+    //   } else if (time - startTime < 6.3) {
+    //     leftLeader.set(0.6);
+    //     leftFollower.set(0.6);
+    //     rightLeader.set(-0.6);
+    //     rightFollower.set(-0.6);
+    //   } else {
+    //     leftLeader.set(0);
+    //     leftFollower.set(0);
+    //     rightLeader.set(0);
+    //     rightFollower.set(0);
+    //   }
+    // }
   }
 
   @Override
-  public void teleopInit() {
-    
-  }
+  public void teleopInit() {}
 
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    //Emergancy Stop + Contorls
-    if (joy1.getRawButtonPressed(7)) {
-        leftLeader.set(0);
-        leftFollower.set(0);
-        rightLeader.set(0);
-        rightFollower.set(0);
-    } else {
-      double speed = -joy1.getRawAxis(1) * 0.6;
-      double turn = joy1.getRawAxis(4) * -0.3;
-
-      double left = speed + turn;
-      double right = speed - turn;
-
-      leftLeader.set(left);
-      leftFollower.set(left);
-      rightLeader.set(-right);
-      rightFollower.set(-right);
-    }
-
+    drive.arcadeDrive(-joy1.getRawAxis(1), -joy1.getRawAxis(4));
   }
 
   @Override
-  public void testInit() {
-    
-  }
+  public void testInit() {}
 
   /** This function is called periodically during test mode. */
   @Override
