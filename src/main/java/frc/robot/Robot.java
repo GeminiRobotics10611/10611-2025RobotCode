@@ -7,8 +7,10 @@ package frc.robot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
-
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 
@@ -18,21 +20,36 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
  * this project, you must also update the Main.java file in the project.
  */
 public class Robot extends TimedRobot {
-
-  private SparkMax leftMotor1 = new SparkMax(1, MotorType.kBrushed);
-  private SparkMax leftMotor2 = new SparkMax(2, MotorType.kBrushed);
-  private SparkMax rightMotor1 = new SparkMax(3, MotorType.kBrushed);
-  private SparkMax rightMotor2 = new SparkMax(4, MotorType.kBrushed);
-  private SparkMax elevator1 = new SparkMax(0, MotorType.kBrushless);
-  private SparkMax elevator2 = new SparkMax(0, MotorType.kBrushless);
-  private SparkMax intake = new SparkMax(0, MotorType.kBrushless);
-  private SparkMax intakePitch = new SparkMax(0, MotorType.kBrushless);
+  private SparkMax leftLeader;
+  private SparkMax leftFollower;
+  private SparkMax rightLeader;
+  private SparkMax rightFollower;
+  //private SparkMax elevator1 = new SparkMax(0, MotorType.kBrushless);
+  //private SparkMax elevator2 = new SparkMax(0, MotorType.kBrushless);
+  //private SparkMax intake = new SparkMax(0, MotorType.kBrushless);
+ // private SparkMax intakePitch = new SparkMax(0, MotorType.kBrushless);
 
   private Joystick joy1 = new Joystick(0);
 
   private double startTime;
 
-  public Robot() {}
+  public Robot() {
+    // Configure left side of drive.
+    leftLeader = new SparkMax(1, MotorType.kBrushed);
+    leftFollower = new SparkMax(2, MotorType.kBrushed);
+    var configLeftFollower = new SparkMaxConfig();
+    configLeftFollower.follow(leftLeader);
+    leftFollower.configure(configLeftFollower, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    // Configure right side of drive.
+    rightLeader = new SparkMax(3, MotorType.kBrushed);
+    rightFollower = new SparkMax(4, MotorType.kBrushed);
+    var configRightFollower = new SparkMaxConfig();
+    configRightFollower.follow(rightLeader);
+    rightFollower.configure(configLeftFollower, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+
+  }
 
  
   @Override
@@ -57,36 +74,36 @@ public class Robot extends TimedRobot {
     //Autonomous + Autonomous Stop
     double time = Timer.getFPGATimestamp();
     if (joy1.getRawButtonPressed(8)) {
-      leftMotor1.set(0);
-      leftMotor2.set(0);
-      rightMotor1.set(0);
-      rightMotor2.set(0);
+      leftLeader.set(0);
+      leftFollower.set(0);
+      rightLeader.set(0);
+      rightFollower.set(0);
     } else {
       if (time - startTime < 2.7) {
-        leftMotor1.set(0.6);
-        leftMotor2.set(0.6);
-        rightMotor1.set(-0.6);
-        rightMotor2.set(-0.6);
+        leftLeader.set(0.6);
+        leftFollower.set(0.6);
+        rightLeader.set(-0.6);
+        rightFollower.set(-0.6);
       } else if (time - startTime < 3.63) {
-        leftMotor1.set(0.3);
-        leftMotor2.set(0.3);
-        rightMotor1.set(0.3);
-        rightMotor2.set(0.3);
+        leftLeader.set(0.3);
+        leftFollower.set(0.3);
+        rightLeader.set(0.3);
+        rightFollower.set(0.3);
       } else if (time - startTime < 4.3) {
-        leftMotor1.set(0.6);
-        leftMotor2.set(0.6);
-        rightMotor1.set(-0.6);
-        rightMotor2.set(-0.6);
+        leftLeader.set(0.6);
+        leftFollower.set(0.6);
+        rightLeader.set(-0.6);
+        rightFollower.set(-0.6);
       } else if (time - startTime < 6.3) {
-        leftMotor1.set(0.6);
-        leftMotor2.set(0.6);
-        rightMotor1.set(-0.6);
-        rightMotor2.set(-0.6);
+        leftLeader.set(0.6);
+        leftFollower.set(0.6);
+        rightLeader.set(-0.6);
+        rightFollower.set(-0.6);
       } else {
-        leftMotor1.set(0);
-        leftMotor2.set(0);
-        rightMotor1.set(0);
-        rightMotor2.set(0);
+        leftLeader.set(0);
+        leftFollower.set(0);
+        rightLeader.set(0);
+        rightFollower.set(0);
       }
     }
   }
@@ -101,10 +118,10 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     //Emergancy Stop + Contorls
     if (joy1.getRawButtonPressed(7)) {
-        leftMotor1.set(0);
-        leftMotor2.set(0);
-        rightMotor1.set(0);
-        rightMotor2.set(0);
+        leftLeader.set(0);
+        leftFollower.set(0);
+        rightLeader.set(0);
+        rightFollower.set(0);
     } else {
       double speed = -joy1.getRawAxis(1) * 0.6;
       double turn = joy1.getRawAxis(4) * -0.3;
@@ -112,10 +129,10 @@ public class Robot extends TimedRobot {
       double left = speed + turn;
       double right = speed - turn;
 
-      leftMotor1.set(left);
-      leftMotor2.set(left);
-      rightMotor1.set(-right);
-      rightMotor2.set(-right);
+      leftLeader.set(left);
+      leftFollower.set(left);
+      rightLeader.set(-right);
+      rightFollower.set(-right);
     }
 
   }
