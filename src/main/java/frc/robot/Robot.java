@@ -23,6 +23,10 @@ public class Robot extends TimedRobot {
   private SparkMax leftMotor2 = new SparkMax(2, MotorType.kBrushed);
   private SparkMax rightMotor1 = new SparkMax(3, MotorType.kBrushed);
   private SparkMax rightMotor2 = new SparkMax(4, MotorType.kBrushed);
+  private SparkMax elevator1 = new SparkMax(0, MotorType.kBrushless);
+  private SparkMax elevator2 = new SparkMax(0, MotorType.kBrushless);
+  private SparkMax intake = new SparkMax(0, MotorType.kBrushless);
+  private SparkMax intakePitch = new SparkMax(0, MotorType.kBrushless);
 
   private Joystick joy1 = new Joystick(0);
 
@@ -50,23 +54,40 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
+    //Autonomous + Autonomous Stop
     double time = Timer.getFPGATimestamp();
-
-    if (time - startTime < 2.8) {
-      leftMotor1.set(0.6);
-      leftMotor2.set(0.6);
-      rightMotor1.set(-0.6);
-      rightMotor2.set(-0.6);
-    } else if (time - startTime < 3.6) {
-      leftMotor1.set(0.3);
-      leftMotor2.set(0.3);
-      rightMotor1.set(0.3);
-      rightMotor2.set(0.3);
-    } else {
+    if (joy1.getRawButtonPressed(8)) {
       leftMotor1.set(0);
       leftMotor2.set(0);
       rightMotor1.set(0);
       rightMotor2.set(0);
+    } else {
+      if (time - startTime < 2.7) {
+        leftMotor1.set(0.6);
+        leftMotor2.set(0.6);
+        rightMotor1.set(-0.6);
+        rightMotor2.set(-0.6);
+      } else if (time - startTime < 3.63) {
+        leftMotor1.set(0.3);
+        leftMotor2.set(0.3);
+        rightMotor1.set(0.3);
+        rightMotor2.set(0.3);
+      } else if (time - startTime < 4.3) {
+        leftMotor1.set(0.6);
+        leftMotor2.set(0.6);
+        rightMotor1.set(-0.6);
+        rightMotor2.set(-0.6);
+      } else if (time - startTime < 6.3) {
+        leftMotor1.set(0.6);
+        leftMotor2.set(0.6);
+        rightMotor1.set(-0.6);
+        rightMotor2.set(-0.6);
+      } else {
+        leftMotor1.set(0);
+        leftMotor2.set(0);
+        rightMotor1.set(0);
+        rightMotor2.set(0);
+      }
     }
   }
 
@@ -78,16 +99,24 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    double speed = -joy1.getRawAxis(1) * 0.6;
-    double turn = joy1.getRawAxis(4) * -0.3;
+    //Emergancy Stop + Contorls
+    if (joy1.getRawButtonPressed(7)) {
+        leftMotor1.set(0);
+        leftMotor2.set(0);
+        rightMotor1.set(0);
+        rightMotor2.set(0);
+    } else {
+      double speed = -joy1.getRawAxis(1) * 0.6;
+      double turn = joy1.getRawAxis(4) * -0.3;
 
-    double left = speed + turn;
-    double right = speed - turn;
+      double left = speed + turn;
+      double right = speed - turn;
 
-    leftMotor1.set(left);
-    leftMotor2.set(left);
-    rightMotor1.set(-right);
-    rightMotor2.set(-right);
+      leftMotor1.set(left);
+      leftMotor2.set(left);
+      rightMotor1.set(-right);
+      rightMotor2.set(-right);
+    }
 
   }
 
