@@ -6,7 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -28,14 +28,16 @@ public class Robot extends TimedRobot {
   private SparkMax leftFollower;
   private SparkMax rightLeader;
   private SparkMax rightFollower;
+  private SparkMax coralIntake;
   private DifferentialDrive drive;
-  private Joystick joy1 = new Joystick(0);
+  private XboxController driverController = new XboxController(0);
 
   public Robot() {
     leftLeader = new SparkMax(1, MotorType.kBrushed);
     leftFollower = new SparkMax(2, MotorType.kBrushed);
     rightLeader = new SparkMax(3, MotorType.kBrushed);
     rightFollower = new SparkMax(4, MotorType.kBrushed);
+    coralIntake = new SparkMax(5, MotorType.kBrushless);
     drive = new DifferentialDrive(rightLeader::set, leftLeader::set);
 
     SparkMaxConfig globalConfig = new SparkMaxConfig();
@@ -94,41 +96,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    // //Autonomous + Autonomous Stop
-    // double time = Timer.getFPGATimestamp();
-    // if (joy1.getRawButtonPressed(8)) {
-    //   leftLeader.set(0);
-    //   leftFollower.set(0);
-    //   rightLeader.set(0);
-    //   rightFollower.set(0);
-    // } else {
-    //   if (time - startTime < 2.7) {
-    //     leftLeader.set(0.6);
-    //     leftFollower.set(0.6);
-    //     rightLeader.set(-0.6);
-    //     rightFollower.set(-0.6);
-    //   } else if (time - startTime < 3.63) {
-    //     leftLeader.set(0.3);
-    //     leftFollower.set(0.3);
-    //     rightLeader.set(0.3);
-    //     rightFollower.set(0.3);
-    //   } else if (time - startTime < 4.3) {
-    //     leftLeader.set(0.6);
-    //     leftFollower.set(0.6);
-    //     rightLeader.set(-0.6);
-    //     rightFollower.set(-0.6);
-    //   } else if (time - startTime < 6.3) {
-    //     leftLeader.set(0.6);
-    //     leftFollower.set(0.6);
-    //     rightLeader.set(-0.6);
-    //     rightFollower.set(-0.6);
-    //   } else {
-    //     leftLeader.set(0);
-    //     leftFollower.set(0);
-    //     rightLeader.set(0);
-    //     rightFollower.set(0);
-    //   }
-    // }
+    drive.arcadeDrive(0.7, 0);
   }
 
   @Override
@@ -137,7 +105,12 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    drive.arcadeDrive(-joy1.getRawAxis(1), -joy1.getRawAxis(4));
+    drive.arcadeDrive(-driverController.getLeftY(), -driverController.getRightX());
+    if(driverController.getRightTriggerAxis() > 0.5) {
+      //Run motor
+    } else {
+      //Stop motor
+    }
   }
 
   @Override
