@@ -3,8 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
-
-import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -31,6 +30,8 @@ public class Robot extends TimedRobot {
   private SparkMax coralIntake;
   private DifferentialDrive drive;
   private XboxController driverController = new XboxController(0);
+  private XboxController operatorController = new XboxController(1);
+  
 
   public Robot() {
     leftLeader = new SparkMax(1, MotorType.kBrushed);
@@ -91,13 +92,24 @@ public class Robot extends TimedRobot {
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
-  public void autonomousInit() {}
+  public void autonomousInit() {
+    
+  }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    drive.arcadeDrive(0.7, 0);
+    double autoTime = Timer.getMatchTime();
+    if (autoTime < 2) {
+      drive.arcadeDrive(0.5, 0);
+    } else if (autoTime < 5) {
+      coralIntake.set(-0.5);
+    } else {
+      coralIntake.set(0);
+    }
+    
   }
+    
 
   @Override
   public void teleopInit() {}
@@ -106,12 +118,19 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     drive.arcadeDrive(-driverController.getLeftY(), -driverController.getRightX());
-    if(driverController.getRightTriggerAxis() > 0.5) {
-      //Run motor
+
+    if (operatorController.getLeftTriggerAxis() > 0.5) {
+      coralIntake.set(-0.05);
+    } else if(operatorController.getRightTriggerAxis() > 0.5) {
+      coralIntake.set(-0.5);
     } else {
-      //Stop motor
+      coralIntake.set(0);
+
     }
-  }
+    
+    
+    
+}
 
   @Override
   public void testInit() {}
